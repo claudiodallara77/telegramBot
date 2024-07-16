@@ -5,7 +5,7 @@ import logger from "../logger";
 let groupLimitGeneric: Record<string, number> = {};
 
 export const getTest = (_req: Request, res: Response) => {
-  logger.warn("test endpoint hit! wsb81");
+  logger.warn("healthcheck endpoint called successfully.");
   res.status(200).json({
     success: "Server is running and bot is active.",
   });
