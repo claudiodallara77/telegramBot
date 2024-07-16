@@ -19,6 +19,7 @@ const express = require("express");
 const app = express();
 const cron = require("node-cron");
 const { Telegraf, Context } = require("telegraf");
+const logger_1 = __importDefault(require("./logger"));
 // Importa le route e le funzioni utility
 const groupLimitRoutes_1 = __importDefault(require("./routes/groupLimitRoutes"));
 const getMemberCount_1 = require("./utils/getMemberCount");
@@ -70,7 +71,7 @@ bot.on("message", (ctx, next) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
     else {
-        console.log(`Il bot con ID ${bot.botInfo.id} non è più un amministratore.`);
+        logger_1.default.info(`Il bot con ID ${bot.botInfo.id} non è più un amministratore.`);
     }
     next(); // Passa il controllo al middleware successivo
 }));
@@ -81,9 +82,9 @@ app.use(groupLimitRoutes_1.default);
 // Configura il server Express per ascoltare le richieste sulla porta specificata
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`Server is running on port ${PORT}`);
-    // Pianifica il job cron per inviare report ogni ora
-    cron.schedule("0 * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    logger_1.default.info(`Server is running on port ${PORT}`);
+    // Pianifica il job cron per inviare report ogni 5 min
+    cron.schedule("*/5 * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
         if (Object.keys(groupStats).length > 0) {
             const chatInfos = {}; // Mappa chatId a chatInfo
             for (const chatId in groupStats) {
@@ -99,15 +100,7 @@ app.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
             // Invia il report con le statistiche aggregate
             yield (0, reportUtils_1.sendReport)(groupStats, chatInfos);
         }
-        else {
-            console.log("Nessun dato da inviare.");
-            // Invia un report vuoto per ogni chat
-            const allChats = yield bot.telegram.getMyCommands();
-            for (const chat of allChats) {
-                const chatId = chat.chat.id;
-                const chatInfo = yield bot.telegram.getChat(chatId);
-                yield (0, reportUtils_1.sendEmptyReport)(chatId, chatInfo);
-            }
-        }
+        else
+            logger_1.default.info("Nessun gruppo registrato con messaggi spediti in attesa per il prossimo report time....");
     }));
 }));

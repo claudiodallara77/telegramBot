@@ -6,7 +6,7 @@ const express = require("express");
 const app = express();
 const cron = require("node-cron");
 const { Telegraf, Context } = require("telegraf");
-
+import logger from "./logger";
 // Importa le route e le funzioni utility
 import groupLimitRoutes from "./routes/groupLimitRoutes";
 import { getParticipantsCount } from "./utils/getMemberCount";
@@ -82,7 +82,7 @@ bot.on("message", async (ctx: typeof Context, next: () => void) => {
       );
     }
   } else {
-    console.log(`Il bot con ID ${bot.botInfo.id} non è più un amministratore.`);
+    logger.info(`Il bot con ID ${bot.botInfo.id} non è più un amministratore.`);
   }
 
   next(); // Passa il controllo al middleware successivo
@@ -97,7 +97,7 @@ app.use(groupLimitRoutes);
 // Configura il server Express per ascoltare le richieste sulla porta specificata
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info(`Server is running on port ${PORT}`);
 
   // Pianifica il job cron per inviare report ogni 5 min
   cron.schedule("*/5 * * * *", async () => {
@@ -119,7 +119,7 @@ app.listen(PORT, async () => {
       // Invia il report con le statistiche aggregate
       await sendReport(groupStats, chatInfos);
     } else
-      console.log(
+      logger.info(
         "Nessun gruppo registrato con messaggi spediti in attesa per il prossimo report time...."
       );
   });

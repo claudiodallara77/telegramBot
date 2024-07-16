@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 import axios from "axios";
 import { GroupStats, ReportPayload } from "../types/types";
+import logger from "../logger";
 
 const { co2 } = require("@tgwf/co2");
 
@@ -26,7 +27,6 @@ const finalEndPoint = endPoint + "/api/v1/reports";
  */
 
 const sendReportData = async (payload: ReportPayload) => {
-  console.log("payload :", payload);
   try {
     const response = await axios.post(finalEndPoint, payload, {
       headers: {
@@ -34,12 +34,12 @@ const sendReportData = async (payload: ReportPayload) => {
         "X-Custom-Origin": "supersegretissimo",
       },
     });
-    console.log(
+    logger.info(
       `Report inviato per il gruppo ${payload.groupId}:`,
       response.data
     );
   } catch (error) {
-    console.error(
+    logger.error(
       `Errore durante l'invio del report per il gruppo ${payload.groupId}:`,
       error
     );

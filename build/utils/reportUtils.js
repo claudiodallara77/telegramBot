@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendReport = exports.sendEmptyReport = void 0;
+exports.sendReport = void 0;
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const axios_1 = __importDefault(require("axios"));
+const logger_1 = __importDefault(require("../logger"));
 const { co2 } = require("@tgwf/co2");
 // Inizializza i modelli CO2 per il calcolo delle emissioni
 const oneByte = new co2({ model: "1byte" });
@@ -35,7 +36,6 @@ const finalEndPoint = endPoint + "/api/v1/reports";
  * @returns {Promise<void>} - Una promessa che si risolve quando l'invio è completato, oppure viene rigettata in caso di errore.
  */
 const sendReportData = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("payload :", payload);
     try {
         const response = yield axios_1.default.post(finalEndPoint, payload, {
             headers: {
@@ -43,10 +43,10 @@ const sendReportData = (payload) => __awaiter(void 0, void 0, void 0, function* 
                 "X-Custom-Origin": "supersegretissimo",
             },
         });
-        console.log(`Report inviato per il gruppo ${payload.groupId}:`, response.data);
+        logger_1.default.info(`Report inviato per il gruppo ${payload.groupId}:`, response.data);
     }
     catch (error) {
-        console.error(`Errore durante l'invio del report per il gruppo ${payload.groupId}:`, error);
+        logger_1.default.error(`Errore durante l'invio del report per il gruppo ${payload.groupId}:`, error);
     }
 });
 // Crea il payload del report con i dati aggregati e le emissioni calcolate
@@ -199,30 +199,6 @@ const createReportPayload = (chatId, stats, groupName = "", participantsCount = 
         adminIds, // Aggiunge gli ID degli amministratori al payload
     };
 };
-// Invia un report vuoto per un gruppo specificato
-const sendEmptyReport = (chatId, chatInfo) => __awaiter(void 0, void 0, void 0, function* () {
-    const payload = createReportPayload(chatId, {
-        totalMessages: 0,
-        totalSizeKB: 0,
-        textTotalMessages: 0,
-        textTotalSize: 0,
-        photoTotalMessages: 0,
-        photoTotalSize: 0,
-        videoTotalMessages: 0,
-        videoTotalSize: 0,
-        voiceTotalMessages: 0,
-        voiceTotalSize: 0,
-        documentTotalMessages: 0,
-        documentTotalSize: 0,
-        pollTotalMessages: 0,
-        pollTotalSize: 0,
-        stickerTotalMessages: 0,
-        stickerTotalSize: 0,
-    }, chatInfo.title || "", chatInfo.membersCount || 0, []);
-    console.log("payload poco prima di spedire vuoto", payload);
-    yield sendReportData(payload);
-});
-exports.sendEmptyReport = sendEmptyReport;
 // Invia report per tutti i gruppi e azzera i contatori dopo l'invio
 const sendReport = (groupStats, chatInfos) => __awaiter(void 0, void 0, void 0, function* () {
     for (const chatId in groupStats) {
