@@ -100,7 +100,7 @@ app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
   // Pianifica il job cron per inviare report ogni 5 min
-  cron.schedule("5 * * * *", async () => {
+  cron.schedule("*/5 * * * *", async () => {
     console.log("Object.keys(groupStats)", Object.keys(groupStats));
     console.log(
       "(Object.keys(groupStats).length > 0)",
