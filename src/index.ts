@@ -101,11 +101,6 @@ app.listen(PORT, async () => {
 
   // Pianifica il job cron per inviare report ogni 5 min
   cron.schedule("*/5 * * * *", async () => {
-    console.log("Object.keys(groupStats)", Object.keys(groupStats));
-    console.log(
-      "(Object.keys(groupStats).length > 0)",
-      Object.keys(groupStats).length > 0
-    );
     if (Object.keys(groupStats).length > 0) {
       const chatInfos: { [key: string]: any } = {}; // Mappa chatId a chatInfo
 
@@ -123,6 +118,9 @@ app.listen(PORT, async () => {
 
       // Invia il report con le statistiche aggregate
       await sendReport(groupStats, chatInfos);
-    } else console.log("Nessun gruppo registrato con messaggi spediti");
+    } else
+      console.log(
+        "Nessun gruppo registrato con messaggi spediti in attesa per il prossimo report time...."
+      );
   });
 });
