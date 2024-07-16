@@ -215,36 +215,6 @@ const createReportPayload = (
   };
 };
 
-// Invia un report vuoto per un gruppo specificato
-export const sendEmptyReport = async (chatId: string, chatInfo: any) => {
-  const payload = createReportPayload(
-    chatId,
-    {
-      totalMessages: 0,
-      totalSizeKB: 0,
-      textTotalMessages: 0,
-      textTotalSize: 0,
-      photoTotalMessages: 0,
-      photoTotalSize: 0,
-      videoTotalMessages: 0,
-      videoTotalSize: 0,
-      voiceTotalMessages: 0,
-      voiceTotalSize: 0,
-      documentTotalMessages: 0,
-      documentTotalSize: 0,
-      pollTotalMessages: 0,
-      pollTotalSize: 0,
-      stickerTotalMessages: 0,
-      stickerTotalSize: 0,
-    },
-    chatInfo.title || "",
-    chatInfo.membersCount || 0,
-    []
-  );
-  console.log("payload poco prima di spedire vuoto", payload);
-  await sendReportData(payload);
-};
-
 // Invia report per tutti i gruppi e azzera i contatori dopo l'invio
 export const sendReport = async (
   groupStats: Record<string, GroupStats>,

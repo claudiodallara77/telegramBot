@@ -16,7 +16,7 @@ import { getTypemessages } from "./utils/getTypeMessage";
 import { initializeGroupStats } from "./utils/statsUtils";
 import { isBotAdmin } from "./utils/isBotAdmin";
 import { updateStats } from "./utils/updateStats";
-import { sendEmptyReport, sendReport } from "./utils/reportUtils";
+import { sendReport } from "./utils/reportUtils";
 import { getAdminIds } from "./utils/getAdminsIds";
 import {
   startCommand,
@@ -123,16 +123,6 @@ app.listen(PORT, async () => {
 
       // Invia il report con le statistiche aggregate
       await sendReport(groupStats, chatInfos);
-    } else {
-      console.log("Nessun dato da inviare.");
-
-      // Invia un report vuoto per ogni chat
-      const allChats = await bot.telegram.getMyCommands();
-      for (const chat of allChats) {
-        const chatId = chat.chat.id;
-        const chatInfo = await bot.telegram.getChat(chatId);
-        await sendEmptyReport(chatId, chatInfo);
-      }
-    }
+    } else console.log("Nessun gruppo registrato con messaggi spediti");
   });
 });
